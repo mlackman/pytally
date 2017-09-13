@@ -25,6 +25,9 @@ class TestTallyLog(unittest.TestCase):
         self.t.add('release 2')
         self.assertEquals(self.t.lines, ['release 1', 'release 2'])
 
+    def test_getting_lines_from_non_existing_log(self):
+        self.assertEquals(self.t.lines, [])
+
     def test_tagging(self):
         self.t.add('release 1')
         self.t.add('release 2')
@@ -40,6 +43,12 @@ class TestTallyLog(unittest.TestCase):
 
     def test_tagging_non_existing_line(self):
         self.t.add('release 1')
+        with self.assertRaises(tallylog.NoSuchLineFound):
+            self.t.tag('release 2', 'current')
+
+    def test_tagging_non_existing_line_but_tag_defined(self):
+        self.t.add('release 1')
+        self.t.tag('release 1', 'current')
         with self.assertRaises(tallylog.NoSuchLineFound):
             self.t.tag('release 2', 'current')
 
@@ -138,6 +147,20 @@ class TestTallyLog(unittest.TestCase):
         self.t.add('release 1')
         with self.assertRaises(tallylog.TagNotFound):
             self.t.line('some tag')
+
+    def test_getting_line_tag(self):
+        self.t.add('release 1')
+        self.t.tag('release 1', 'current')
+        self.assertEquals(self.t.line_tag('release 1'), 'current')
+
+    def test_getting_line_tag_when_line_does_not_have_tag(self):
+        self.t.add('release 1')
+        self.assertEquals(self.t.line_tag('release 1'), None)
+
+    def test_getting_line_tag_when_line_does_not_exists(self):
+        self.t.add('release 1')
+        with self.assertRaises(tallylog.NoSuchLineFound):
+            self.t.line_tag('release 2')
 
     def assert_tally_contains(self, expected_lines):
         with open(self.TALLY_FILENAME, 'rt') as f:

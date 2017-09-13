@@ -11,6 +11,9 @@ class TallyLog():
 
     @property
     def lines(self):
+        if not os.path.exists(self.filename):
+            return []
+
         with open(self.filename, 'rt') as f:
             return [line.rstrip() for line in f.readlines()]
 
@@ -27,11 +30,16 @@ class TallyLog():
         return self._strip_tag(lines[tag_positions[0]])
 
     def tag(self, line_to_be_tagged, tag):
-        updated_lines = self._add_tag_to_lines(line_to_be_tagged, tag, self.lines)
+        lines = self.lines
+        updated_lines = self._add_tag_to_lines(line_to_be_tagged, tag, lines)
 
-        self._raise_exception_if_tag_not_set(updated_lines, tag)
+        self._raise_exception_if_tag_not_set(line_to_be_tagged, updated_lines, tag)
 
         self._overwrite_tally(updated_lines)
+
+    def line_tag(self, line):
+        lines = self.lines
+        return self._get_line_tag(line, lines)
 
     def remove_tag(self, tag):
         with open(self.filename, 'rt') as f:
@@ -90,8 +98,8 @@ class TallyLog():
         with open(self.filename, 'wt') as f:
             f.writelines([line + os.linesep for line in lines])
 
-    def _raise_exception_if_tag_not_set(self, lines, tag):
-        if not any([tag in line for line in lines]):
+    def _raise_exception_if_tag_not_set(self, line_tagged, lines, tag):
+        if self._get_line_tag(line_tagged, lines) != tag:
             raise NoSuchLineFound()
 
     def _strip_tag(self, line):
@@ -100,6 +108,25 @@ class TallyLog():
     def _tag_positions(self, tag, lines):
         tag_lines = filter(lambda line: tag in line, lines)
         return [lines.index(tag_line) for tag_line in tag_lines]
+
+    def _tag_in_line(self, line):
+        return line.find('[') != -1
+
+    def _get_line_tag(self, line, lines):
+        lines_without_tag = [line.split('[')[0].rstrip() for line in lines]
+
+        if line not in lines_without_tag:
+            raise NoSuchLineFound()
+
+        line_index = lines_without_tag.index(line)
+        line_with_tag = lines[line_index]
+
+        if not self._tag_in_line(line_with_tag):
+            return None
+
+        return line_with_tag.split('[')[1].strip(']')
+
+
 
 class NoSuchLineFound(Exception):
     pass
