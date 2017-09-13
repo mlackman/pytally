@@ -128,6 +128,17 @@ class TestTally(unittest.TestCase):
         self.t.remove_first()
         self.assert_tally_contains([])
 
+    def test_getting_line_with_tag(self):
+        self.t.add('release 1')
+        self.t.tag('release 1', 'current')
+
+        self.assertEquals(self.t.line('current'), 'release 1')
+
+    def test_getting_line_with_tag_when_tag_does_not_exists(self):
+        self.t.add('release 1')
+        with self.assertRaises(tally.TagNotFound):
+            self.t.line('some tag')
+
     def assert_tally_contains(self, expected_lines):
         with open(self.TALLY_FILENAME, 'rt') as f:
             lines = f.read().splitlines()

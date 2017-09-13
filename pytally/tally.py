@@ -18,6 +18,14 @@ class Tally:
         with open(self.filename, 'at') as f:
             f.write(line + os.linesep)
 
+    def line(self, tag):
+        """Return line with tag. Tag is not included in line"""
+        lines = self.lines
+        tag_positions = self._tag_positions(tag, lines)
+        if not tag_positions:
+            raise TagNotFound()
+        return self._strip_tag(lines[tag_positions[0]])
+
     def tag(self, line_to_be_tagged, tag):
         updated_lines = self._add_tag_to_lines(line_to_be_tagged, tag, self.lines)
 
