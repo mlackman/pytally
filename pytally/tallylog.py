@@ -1,7 +1,7 @@
 import os
 
 
-class Tally:
+class TallyLog():
 
     _DOWN = 1
     _UP = -1

@@ -1,22 +1,22 @@
 import unittest
 import os
 
-from pytally import tally
+from pytally import tallylog
 
 
-class TestTally(unittest.TestCase):
+class TestTallyLog(unittest.TestCase):
     TALLY_FILENAME = 'release.txt'
 
     def setUp(self):
         if os.path.exists(self.TALLY_FILENAME):
             os.remove(self.TALLY_FILENAME)
-        self.t = tally.Tally(self.TALLY_FILENAME)
+        self.t = tallylog.TallyLog(self.TALLY_FILENAME)
 
     def test_adding(self):
         self.t.add('release 1')
         self.assert_tally_contains(['release 1'])
 
-        t=tally.Tally(self.TALLY_FILENAME)
+        t=tallylog.TallyLog(self.TALLY_FILENAME)
         t.add('release 2')
         self.assert_tally_contains(['release 1', 'release 2'])
 
@@ -40,7 +40,7 @@ class TestTally(unittest.TestCase):
 
     def test_tagging_non_existing_line(self):
         self.t.add('release 1')
-        with self.assertRaises(tally.NoSuchLineFound):
+        with self.assertRaises(tallylog.NoSuchLineFound):
             self.t.tag('release 2', 'current')
 
     def test_overriding_tag(self):
@@ -90,14 +90,14 @@ class TestTally(unittest.TestCase):
 
     def test_move_tag_up_when_tag_does_not_exist(self):
         self.t.add('release 1')
-        with self.assertRaises(tally.TagNotFound):
+        with self.assertRaises(tallylog.TagNotFound):
             self.t.move_tag_up('current')
 
     def test_move_tag_up_when_no_lines_above(self):
         self.t.add('release 1')
         self.t.tag('release 1', 'current')
 
-        with self.assertRaises(tally.CannotMoveTag):
+        with self.assertRaises(tallylog.CannotMoveTag):
             self.t.move_tag_up('current')
 
     def test_move_tag_down(self):
@@ -115,12 +115,12 @@ class TestTally(unittest.TestCase):
         self.t.add('release 1')
         self.t.tag('release 1', 'current')
 
-        with self.assertRaises(tally.CannotMoveTag):
+        with self.assertRaises(tallylog.CannotMoveTag):
             self.t.move_tag_down('current')
 
     def test_move_tag_down_when_tag_does_not_exists(self):
         self.t.add('release 1')
-        with self.assertRaises(tally.TagNotFound):
+        with self.assertRaises(tallylog.TagNotFound):
             self.t.move_tag_down('current')
 
     def test_remove_first_line(self):
@@ -136,7 +136,7 @@ class TestTally(unittest.TestCase):
 
     def test_getting_line_with_tag_when_tag_does_not_exists(self):
         self.t.add('release 1')
-        with self.assertRaises(tally.TagNotFound):
+        with self.assertRaises(tallylog.TagNotFound):
             self.t.line('some tag')
 
     def assert_tally_contains(self, expected_lines):
