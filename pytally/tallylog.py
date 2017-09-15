@@ -47,7 +47,11 @@ class TallyLog():
 
     @property
     def lines(self):
-        return list(map(lambda line: str(line), self._read_lines()))
+        return list(map(lambda line: str(line), self._lines))
+
+    @property
+    def tagless_lines(self):
+        return [str(line) for line in self._lines if not line.tag_exists]
 
     def add(self, line):
         self._lines.append(Line(line))

@@ -18,7 +18,12 @@ def add(line):
 @click.command(help='prints log')
 def lines():
     for line in log.lines:
-        click.echo(line, err=True)
+        click.echo(line)
+
+@click.command(help='prints lines without tag')
+def tagless_lines():
+    for line in log.tagless_lines:
+        click.echo(line)
 
 @click.command(help='prints line with given tag')
 @click.argument('tag')
@@ -100,6 +105,7 @@ cli.add_command(move_tag_up)
 cli.add_command(move_tag_down)
 cli.add_command(remove_first_line)
 cli.add_command(change_tag)
+cli.add_command(tagless_lines)
 
 def handle_tag_not_found(tag):
     click.echo(f'Tag "{tag}" was not found!', err=True)

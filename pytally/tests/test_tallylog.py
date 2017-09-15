@@ -212,6 +212,13 @@ class TestTallyLog(unittest.TestCase):
         with self.assertRaises(tallylog.TagNotFound):
             self.t.change_tag('current', 'previous')
 
+    def test_getting_tagless_lines(self):
+        self.t.add('release 1')
+        self.t.add('release 2')
+        self.t.add('release 3')
+        self.t.tag('release 2', 'current')
+
+        self.assertEquals(self.t.tagless_lines, ['release 1', 'release 3'])
 
     def assert_tally_contains(self, expected_lines):
         with open(self.TALLY_FILENAME, 'rt') as f:
