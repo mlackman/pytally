@@ -18,13 +18,13 @@ def add(line):
 @click.command(help='prints log')
 def lines():
     for line in log.lines:
-        click.echo(line)
+        click.echo(line, err=True)
 
 @click.command(help='prints line with given tag')
 @click.argument('tag')
 def line(tag):
     try:
-        click.echo(log.line(tag))
+        click.echo(log.line(tag), err=True)
     except tallylog.TagNotFound:
         handle_tag_not_found(tag)
 
@@ -35,7 +35,7 @@ def tag(line, tag):
     try:
         log.tag(line, tag)
     except tallylog.NoSuchLineFound:
-        click.echo(f'Line "{line}" was not found in log')
+        click.echo(f'Line "{line}" was not found in log', err=True)
         exit(-1)
 
 @click.command(help='remove tag')
@@ -50,7 +50,7 @@ def move_tag(from_line, to_line):
     try:
         log.move_tag(from_line, to_line)
     except tallylog.NoSuchLineFound:
-        click.echo(f'Line was not found!')
+        click.echo(f'Line was not found!', err=True)
         exit(-1)
     except tallylog.TagNotFound:
         handle_tag_not_found(tag)
@@ -61,7 +61,7 @@ def move_tag_up(tag):
     try:
         log.move_tag_up(tag)
     except tallylog.CannotMoveTag:
-        click.echo(f'"{tag}" cannot be moved. It is on first line')
+        click.echo(f'"{tag}" cannot be moved. It is on first line', err=True)
         exit(-1)
     except tallylog.TagNotFound:
         handle_tag_not_found(tag)
@@ -72,7 +72,7 @@ def move_tag_down(tag):
     try:
         log.move_tag_down(tag)
     except tallylog.CannotMoveTag:
-        click.echo(f'"{tag}" cannot be moved. It is on last line')
+        click.echo(f'"{tag}" cannot be moved. It is on last line', err=True)
         exit(-1)
     except tallylog.TagNotFound:
         handle_tag_not_found(tag)
@@ -81,6 +81,14 @@ def move_tag_down(tag):
 def remove_first_line():
     log.remove_first()
 
+@click.command(help='changes tag to other')
+@click.argument('old_tag')
+@click.argument('new_tag')
+def change_tag(old_tag, new_tag):
+    try:
+        log.change_tag(old_tag, new_tag)
+    except tallylog.TagNotFound:
+        handle_tag_not_found(old_tag)
 
 cli.add_command(add)
 cli.add_command(lines)
@@ -91,9 +99,10 @@ cli.add_command(move_tag)
 cli.add_command(move_tag_up)
 cli.add_command(move_tag_down)
 cli.add_command(remove_first_line)
+cli.add_command(change_tag)
 
 def handle_tag_not_found(tag):
-    click.echo(f'Tag "{tag}" was not found!')
+    click.echo(f'Tag "{tag}" was not found!', err=True)
     exit(-1)
 
 

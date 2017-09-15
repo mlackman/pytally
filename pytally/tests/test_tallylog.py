@@ -201,6 +201,18 @@ class TestTallyLog(unittest.TestCase):
         with self.assertRaises(tallylog.NoSuchLineFound):
             self.t.line_tag('release 2')
 
+    def test_change_tag(self):
+        self.t.add('release 1')
+        self.t.tag('release 1', 'current')
+        self.t.change_tag('current', 'previous')
+        self.assert_tally_contains(['release 1 [previous]'])
+
+    def test_changing_non_existing_tag(self):
+        self.t.add('release 1')
+        with self.assertRaises(tallylog.TagNotFound):
+            self.t.change_tag('current', 'previous')
+
+
     def assert_tally_contains(self, expected_lines):
         with open(self.TALLY_FILENAME, 'rt') as f:
             lines = f.read().splitlines()

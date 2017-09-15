@@ -71,7 +71,6 @@ class TallyLog():
         self._lines = self._lines[1:]
         self._commit()
 
-
     def tag(self, line_to_be_tagged:str, tag:str):
         line_to_tag = self._find_line(Line(line_to_be_tagged))
         if line_to_tag is None:
@@ -103,6 +102,12 @@ class TallyLog():
     def move_tag_down(self, tag):
         self._move_tag(tag, self._DOWN)
 
+    def change_tag(self, tag_to_change, new_tag):
+        positions = self._tag_positions(tag_to_change)
+        lines = [self._lines[position] for position in positions]
+        for line in lines:
+            self.tag(line.line, new_tag)
+
     def _find_line_or_raise(self, line:Line) -> Line:
         l = self._find_line(line)
         if l is None:
@@ -120,8 +125,6 @@ class TallyLog():
 
         new_tag_positions = [tag_pos + direction for tag_pos in tag_positions]
 
-        if tag_positions == []:
-            raise TagNotFound()
         if any([tag_pos < 0 or tag_pos > len(self._lines)-1 for tag_pos in  new_tag_positions]):
             raise CannotMoveTag()
 
@@ -141,7 +144,10 @@ class TallyLog():
 
     def _tag_positions(self, tag):
         tag_lines = filter(lambda line: line.has_tag(tag), self._lines)
-        return [self._lines.index(tag_line) for tag_line in tag_lines]
+        positions = [self._lines.index(tag_line) for tag_line in tag_lines]
+        if positions == []:
+            raise TagNotFound()
+        return positions
 
     def _read_lines(self):
         if not os.path.exists(self.filename):
