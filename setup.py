@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pytally',
-      version='0.2',
+      version='0.3',
       description='Simple bookkeeping',
       url='https://github.com/mlackman/pytally',
       author='Mika Lackman',
