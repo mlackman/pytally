@@ -60,18 +60,24 @@ class TallyLog():
             raise TagNotFound()
         return found[0].line
 
+    def line_tag(self, line):
+        line = self._find_line(Line(line))
+        if line is None:
+            raise NoSuchLineFound()
+        return line.tag
+
+    def remove_first(self):
+        """Removes first line"""
+        self._lines = self._lines[1:]
+        self._commit()
+
+
     def tag(self, line_to_be_tagged:str, tag:str):
         line_to_tag = self._find_line(Line(line_to_be_tagged))
         if line_to_tag is None:
             raise NoSuchLineFound()
         line_to_tag.tag = tag
         self._commit()
-
-    def line_tag(self, line):
-        line = self._find_line(Line(line))
-        if line is None:
-            raise NoSuchLineFound()
-        return line.tag
 
     def remove_tag(self, tag):
         """Removes all tags"""
@@ -96,10 +102,6 @@ class TallyLog():
 
     def move_tag_down(self, tag):
         self._move_tag(tag, self._DOWN)
-
-    def remove_first(self):
-        self._lines = self._lines[1:]
-        self._commit()
 
     def _find_line_or_raise(self, line:Line) -> Line:
         l = self._find_line(line)
