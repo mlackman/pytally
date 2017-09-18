@@ -176,6 +176,30 @@ class TestTallyLog(unittest.TestCase):
         self.t.remove_first()
         self.assert_tally_contains([])
 
+    def test_remove_line(self):
+        self.t.add('release 1')
+        self.t.add('release 2')
+
+        self.t.remove_line('release 1')
+        self.assert_tally_contains(['release 2'])
+
+    def test_remove_line_when_line_contains_tag(self):
+        self.t.add('release 1')
+        self.t.add('release 2')
+        self.t.tag('release 1', 'current')
+
+        self.t.remove_line('release 1')
+
+        self.assert_tally_contains(['release 2'])
+
+    def test_remove_non_existing_line(self):
+        self.t.add('release 2')
+
+        with self.assertRaises(tallylog.NoSuchLineFound):
+            self.t.remove_line('release 1')
+
+
+
     def test_getting_line_with_tag(self):
         self.t.add('release 1')
         self.t.tag('release 1', 'current')

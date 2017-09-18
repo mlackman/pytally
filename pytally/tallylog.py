@@ -75,6 +75,14 @@ class TallyLog():
         self._lines = self._lines[1:]
         self._commit()
 
+    def remove_line(self, line):
+        """Removes line which matches line, line can contain tag"""
+        try:
+            self._lines.remove(Line(line))
+        except ValueError:
+            raise NoSuchLineFound()
+        self._commit()
+
     def tag(self, line_to_be_tagged:str, tag:str):
         line_to_tag = self._find_line(Line(line_to_be_tagged))
         if line_to_tag is None:
